@@ -6,7 +6,10 @@ import (
 	"sync"
 )
 
-var wg sync.WaitGroup //usually pointer
+var signals = []string{"test"}
+
+var wg sync.WaitGroup // usually pointer
+var mut sync.Mutex    // usually pointer
 
 func main() {
 	//goroutine is created by adding keyword go
@@ -24,6 +27,7 @@ func main() {
 		wg.Add(1) //add waiting - 1 means one group is out there. can ne more
 	}
 	wg.Wait() //always at end of method
+	fmt.Println(signals)
 }
 
 // func greeter(s string) {
@@ -41,6 +45,9 @@ func getStatusCode(endpoint string) {
 		fmt.Printf("OOPS in %s\n", endpoint)
 
 	} else {
+		mut.Lock() // in case of memory as - signals is shared
+		signals = append(signals, endpoint)
+		mut.Unlock()
 		fmt.Printf("%d status code for %s\n", res.StatusCode, endpoint)
 	}
 
